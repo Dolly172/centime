@@ -5,9 +5,9 @@ const initialState = {
   data: {
     inflow:  5000,
     outflow: {
-        Bills: 1000,
-        Misc: 2000,
-        Total: 3000,  
+        bills: 1000,
+        misc: 2000,
+        total: 3000,  
     },
     remaining: 2000 
   },

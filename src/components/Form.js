@@ -13,10 +13,10 @@ function Form(){
 
     const [inflow, setInflow] = useState(5000);
     const [outflow, setOutflow] = useState({
-          Bills: 1000,
-          Misc: 2000,
+          bills: 1000,
+          misc: 2000,
       });
-    const [total, setTotal] = useState(outflow.Bills + outflow.Misc);
+    const [total, setTotal] = useState(outflow.bills + outflow.misc);
     const [remaining, setRemaining] = useState(inflow - total);
     const [edit, setEdit] = useState(false);
 
@@ -26,14 +26,14 @@ function Form(){
         if (name === 'inflow') {
           const newInflow = parseInt(value);
           setInflow(newInflow);          
-          const updatedTotal = outflow.Bills + outflow.Misc;
+          const updatedTotal = outflow.bills + outflow.misc;
           const updatedRemaining = newInflow - updatedTotal;
           setTotal(updatedTotal);
           setRemaining(updatedRemaining);
-        } else if (name === 'Bills' || name === 'Misc') {
+        } else if (name === 'bills' || name === 'misc') {
           const updatedOutflow = { ...outflow, [name]: parseInt(value) };
           setOutflow(updatedOutflow);
-          const updatedTotal = updatedOutflow.Bills + updatedOutflow.Misc;
+          const updatedTotal = updatedOutflow.bills + updatedOutflow.misc;
           setTotal(updatedTotal);
           const updatedRemaining = inflow - updatedTotal;
           setRemaining(updatedRemaining);
@@ -44,9 +44,9 @@ function Form(){
         const newData = {
             inflow: inflow, 
             outflow: {
-              Bills: outflow.Bills, 
-              Misc: outflow.Misc,  
-              Total: total, 
+              bills: outflow.bills, 
+              misc: outflow.misc,  
+              total: total, 
             },
             remaining: remaining, 
           };
@@ -72,11 +72,11 @@ function Form(){
         <div className="bills">
             <span>
             <label>{t('Bills')}</label>
-            <input name="Bills" value={outflow.Bills} type="number" onChange={handleInputChange} />
+            <input name="bills" value={outflow.bills} type="number" onChange={handleInputChange} />
             </span>
             <span className="misc">
             <label>{t('Miscelleneous')}</label>
-            <input name="Misc" value={outflow.Misc} type="number" onChange={handleInputChange} />
+            <input name="misc" value={outflow.misc} type="number" onChange={handleInputChange} />
             </span>
         </div>
         <div>
