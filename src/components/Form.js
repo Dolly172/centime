@@ -5,8 +5,6 @@ import { useTranslation } from "react-i18next";
 
 function Form(){
     
-    const { data } = useSelector(state => state.chart);
-
     let dispatch = useDispatch();
     const languages = ['en', 'sp', 'it', 'fr'];
     const {t} = useTranslation('translation');
@@ -67,12 +65,12 @@ function Form(){
         <div className="container">
         <div>
             <label>{t('Total Income')}</label>
-            <input name="inflow" value={inflow} type="number" onChange={handleInputChange} />
+            <input data-testid="inflow"  name="inflow" value={inflow} type="number" onChange={handleInputChange} />
         </div>
         <div className="bills">
             <span>
             <label>{t('Bills')}</label>
-            <input name="bills" value={outflow.bills} type="number" onChange={handleInputChange} />
+            <input data-testid="bills" name="bills" value={outflow.bills} type="number" onChange={handleInputChange} />
             </span>
             <span className="misc">
             <label>{t('Miscelleneous')}</label>
@@ -89,7 +87,7 @@ function Form(){
         </div>
         <div>
             <span className="submit">
-                <button onClick={handleSubmit}>{t('Submit')}</button>
+                <button data-testid="submit-button" onClick={handleSubmit}>{t('Submit')}</button>
             </span>  
         </div>
         <div>
@@ -104,7 +102,7 @@ function Form(){
         </div>    
         </div>
     :
-        <span className="edit" onClick={() => setEdit(true)}>Edit</span>
+        <span data-testid="edit-button" className="edit" onClick={() => setEdit(true)}>Edit</span>
         }
         </>
         
