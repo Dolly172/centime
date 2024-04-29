@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import store from '../store';
 
 describe("Header", () => {
-    it("should render the component", () => {
+    test("should render the component", () => {
       render(
         <Provider store={store}>
           <Form />

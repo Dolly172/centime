@@ -5,12 +5,23 @@ import { Provider } from 'react-redux';
 import store from '../store';
 
 describe("Header", () => {
-    it("should render the component", () => {
+    test("should render the component", () => {
       render(
         <Provider store={store}>
           <BarChart />
         </Provider>
-      
     );
     });
+    test('renders the chart with legend displayed', () => {
+        const { container } = render(
+          <Provider store={store}>
+            <BarChart />
+          </Provider>
+        );
+      
+        const legend = container.querySelector('.chart .legend');
+        expect(() => legend).not.toThrow();
+
+      });
+
   });
