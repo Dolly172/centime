@@ -3,11 +3,14 @@ import i18n from '../i18n';
 
 const initialState = {
   data: {
-    inflow:  5000,
+    inflow: {
+      salary: 5000,
+      total: 5000
+    },
     outflow: {
         bills: 1000,
         misc: 2000,
-        total: 3000,  
+        total: 3000,
     },
     remaining: 2000 
   },

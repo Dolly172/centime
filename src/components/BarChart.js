@@ -8,40 +8,43 @@ function BarChart() {
   const { data } = useSelector(state => state.chart);
   const {t} = useTranslation('translation');
 
+  const inflowTotal = data.inflow.total;
+  const outflowCategories = Object.keys(data.outflow).filter(key => key !== 'total');
+  const outflowCategoriesTranslated = outflowCategories.map(category => t(category));
+  const outflowData = Object.values(data.outflow);
+  const totalOutflow = data.outflow.total;
+
+
   const chartData = {
-    labels: ['Inflow', 'Outflow'], 
+    labels: [t('Inflow'), t('Outflow'), ...outflowCategoriesTranslated], // Labels for inflow and outflow
     datasets: [
       {
-        label: t('Salary'),
-        backgroundColor: 'rgba(255, 205, 86, 0.2)',
-        data: [data.inflow, 0], 
-        borderColor: 'rgb(255, 205, 86)',
+        label: t('Inflow Total'),
+        backgroundColor: ['rgba(255, 205, 86, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+        data: [inflowTotal], 
+        borderColor: ['rgb(255, 205, 86)', 'rgb(54, 162, 235)'],
         borderWidth: 1,
+        stack: 'stack1', 
       },
       {
-        label: t('Total Expense'),
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        data: [0, data.outflow.total], 
-        borderColor: 'rgb(54, 162, 235)',
-        borderWidth: 1,
-      },
-      {
-        label: t('Bills'),
+        label: t('Outflow Total'),
         backgroundColor: 'rgba(255, 99, 132, 0.2)', 
-        data: [0, data.outflow.bills], 
+        data: [0, totalOutflow], 
         borderColor: 'rgb(255, 99, 132)',
         borderWidth: 1,
+        stack: 'stack1', 
       },
       {
-        label: t('Miscellenous'),
-        backgroundColor: 'rgba(255, 205, 86, 0.2)', 
-        data: [0, data.outflow.misc], 
-        borderColor: 'rgb(54, 162, 235)',
+        label: t('Outflow Categories'),
+        backgroundColor: 'pink', 
+        data: [0, 0, ...outflowData], 
+        borderColor: 'rgb(255, 99, 132)',
         borderWidth: 1,
+        stack: 'stack1', 
       },
     ],
   };
-
+ 
   const titleText = t('Inflow and Outflow Data');
 
   const options = {

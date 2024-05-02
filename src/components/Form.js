@@ -1,7 +1,14 @@
-import React, {useState} from "react";
+
+import React, {useState, useEffect} from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import {updateData, changeLanguage} from '../store/index';
 import { useTranslation } from "react-i18next";
+import OutflowSection from "./OutflowSection";
+import InflowSection from "./InflowSection";
+import LanguageSelectorSection from "./LanguageSelectorSection";
+import RemainingSection from "./RemainingSection";
+import TotalExpenseSection from "./TotalExpenseSection";
+import AddEntry from "./AddEntry";
 
 function Form(){
     
@@ -9,47 +16,123 @@ function Form(){
     const languages = ['en', 'sp', 'it', 'fr'];
     const {t} = useTranslation('translation');
 
-    const [inflow, setInflow] = useState(5000);
+    const [inflow, setInflow] = useState({
+      salary: 5000,
+    });
+    const [totalInflow, settotalInflow] = useState()
     const [outflow, setOutflow] = useState({
           bills: 1000,
           misc: 2000,
       });
-    const [total, setTotal] = useState(outflow.bills + outflow.misc);
-    const [remaining, setRemaining] = useState(inflow - total);
+    const [totalOutflow, settotalOutflow] = useState();
+    const [remaining, setRemaining] = useState(totalInflow - totalOutflow);
     const [edit, setEdit] = useState(false);
+    const [newEntry, setNewEntry] = useState({
+      category: '',
+      amount: '',
+      type: 'inflow',
+    });
+
+    useEffect(() => {
+      const totalInflow = Object.values(inflow).reduce((acc, curr) => acc + curr, 0);
+      settotalInflow(totalInflow);
+      const totalOutflow = Object.values(outflow).reduce((acc, curr) => acc + curr, 0);
+      settotalOutflow(totalOutflow);
+      setRemaining(totalInflow - totalOutflow);
+    }, [inflow, outflow]);
+
+    const handleCategoryChange = (event) => {
+      setNewEntry({ ...newEntry, category: event.target.value });
+    };
+  
+    const handleAmountChange = (event) => {
+      setNewEntry({ ...newEntry, amount: event.target.value });
+    };
+
+    const handleTypeChange = (event) => {
+      setNewEntry({ ...newEntry, type: event.target.value });
+    };
+
+    const handleAddNewEntry = () => {
+      const { category, amount, type } = newEntry;
+      if (category && amount && type) {
+        if (type === 'inflow') {
+          setInflow(prevInflow => ({
+            ...prevInflow,
+            [category]: parseInt(amount),
+          }));
+        } else {
+          setOutflow(prevOutflow => ({
+            ...prevOutflow,
+            [category]: parseInt(amount),
+          }));
+        }
+        setNewEntry({ category: '', amount: '', type: 'inflow' });
+      }
+    };
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-        
+
         if (name === 'inflow') {
-          const newInflow = parseInt(value);
-          setInflow(newInflow);          
-          const updatedTotal = outflow.bills + outflow.misc;
-          const updatedRemaining = newInflow - updatedTotal;
-          setTotal(updatedTotal);
-          setRemaining(updatedRemaining);
-        } else if (name === 'bills' || name === 'misc') {
-          const updatedOutflow = { ...outflow, [name]: parseInt(value) };
-          setOutflow(updatedOutflow);
-          const updatedTotal = updatedOutflow.bills + updatedOutflow.misc;
-          setTotal(updatedTotal);
-          const updatedRemaining = inflow - updatedTotal;
-          setRemaining(updatedRemaining);
+          setInflow(parseInt(value));
+      } else if (name in inflow) {
+          setInflow(prevInflow => ({
+              ...prevInflow,
+              [name]: parseInt(value),
+          }));
+      } else if (name === 'bills' || name === 'misc') {
+          setOutflow(prevOutflow => ({
+              ...prevOutflow,
+              [name]: parseInt(value),
+          }));
+      }
+      };
+
+      const handleDeleteEntry = (type, category) => {
+        if (type === 'inflow') {
+          setInflow(prevInflow => ({
+            ...prevInflow,
+            [category]: 0, 
+          }));
+        } else {
+          setOutflow(prevOutflow => ({
+            ...prevOutflow,
+            [category]: 0, 
+          }));
         }
       };
     
       const handleSubmit = () => {
-        const newData = {
-            inflow: inflow, 
-            outflow: {
-              bills: outflow.bills, 
-              misc: outflow.misc,  
-              total: total, 
-            },
-            remaining: remaining, 
-          };
 
+        const updatedInflow = { ...inflow };
+        const updatedOutflow = { ...outflow };
+
+      // value of categories marked for deletion to zero
+      Object.keys(inflow).forEach(category => {
+        if (inflow[category] === 0) {
+          delete updatedInflow[category];
+        }
+      });
+
+      Object.keys(outflow).forEach(category => {
+          if (outflow[category] === 0) {
+            delete updatedOutflow[category];
+          }
+        });
+
+        const totalInflow = Object.values(updatedInflow).reduce((acc, curr) => acc + curr, 0);
+        const totalOutflow = Object.values(updatedOutflow).reduce((acc, curr) => acc + curr, 0);
+
+        const updatedRemaining = totalInflow - totalOutflow;
+
+        const newData = {
+          inflow: { ...updatedInflow, total: totalInflow },
+          outflow: { ...updatedOutflow, total: totalOutflow },
+          remaining: updatedRemaining,
+        };
         dispatch(updateData(newData));
+
         setEdit(false);
       };
 
@@ -63,49 +146,44 @@ function Form(){
         <>
         {edit ?
         <div className="container">
-        <div>
-            <label>{t('Total Income')}</label>
-            <input data-testid="inflow"  name="inflow" value={inflow} type="number" onChange={handleInputChange} />
-        </div>
-        <div className="bills">
-            <span>
-            <label>{t('Bills')}</label>
-            <input data-testid="bills" name="bills" value={outflow.bills} type="number" onChange={handleInputChange} />
-            </span>
-            <span className="misc">
-            <label>{t('Miscelleneous')}</label>
-            <input name="misc" value={outflow.misc} type="number" onChange={handleInputChange} />
-            </span>
-        </div>
-        <div>
-        <label>{t('Total Expense')}</label>
-        <input name="Total" value={total} type="number" readOnly onChange={handleInputChange} />
-        </div>
-        <div>
-            <label>{t('Remaining')}</label>
-            <input name="remaining" value={remaining} type="number" readOnly onChange={handleInputChange} />
-        </div>
+          <div>
+          <label className="headline">{t('Total Inflow')}</label>
+          <input name='totalInflow' value={totalInflow} readOnly type="number" />
+          </div>
+        
+        <InflowSection 
+              inflow={inflow} 
+              handleInputChange={handleInputChange} 
+              handleDeleteEntry={handleDeleteEntry}
+              />
+        <OutflowSection 
+              outflow={outflow} 
+              handleInputChange={handleInputChange} 
+              handleDeleteEntry={handleDeleteEntry}
+              />
+        
+        <AddEntry 
+              newEntry={newEntry} 
+              handleCategoryChange={handleCategoryChange}
+              handleAmountChange={handleAmountChange}
+              handleTypeChange={handleTypeChange}
+              handleAddNewEntry={handleAddNewEntry}
+              />
+        
+        <TotalExpenseSection totalOutflow={totalOutflow}/>
+        <RemainingSection remaining={remaining}/>
+        
         <div>
             <span className="submit">
                 <button data-testid="submit-button" onClick={handleSubmit}>{t('Submit')}</button>
             </span>  
         </div>
-        <div>
-            <span>
-            Languages: 
-            <select onChange={handleLanguageChange}>
-                {languages.map(lang => (
-                    <option key={lang} value={lang}>{lang}</option>
-                ))}
-            </select>
-            </span>
-        </div>    
+        <LanguageSelectorSection languages={languages} handleLanguageChange={handleLanguageChange}/>
         </div>
     :
         <span data-testid="edit-button" className="edit" onClick={() => setEdit(true)}>Edit</span>
         }
         </>
-        
     )
 }
 
