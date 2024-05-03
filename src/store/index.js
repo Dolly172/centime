@@ -25,8 +25,18 @@ const chartSlice = createSlice({
   initialState,
   reducers: {
     updateData: (state, action) => {
-      // console.log(action);
-      state.data = action.payload;
+
+      const { inflow, outflow } = action.payload;
+      if (inflow) {
+        state.data.inflow = inflow;
+      }
+      if (outflow) {
+        state.data.outflow = outflow;
+      }
+      const totalInflow = Object.values(state.data.inflow).reduce((acc, curr) => acc + curr, 0);
+      const totalOutflow = Object.values(state.data.outflow).reduce((acc, curr) => acc + curr, 0);
+      state.data.remaining = totalInflow - totalOutflow;
+     
     },
   },
 });

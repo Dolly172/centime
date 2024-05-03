@@ -12,18 +12,17 @@ import AddEntry from "./AddEntry";
 
 function Form(){
     
+    const { data } = useSelector(state => state.chart);
     let dispatch = useDispatch();
     const languages = ['en', 'sp', 'it', 'fr'];
     const {t} = useTranslation('translation');
 
-    const [inflow, setInflow] = useState({
-      salary: 5000,
-    });
+    const { total: inflowTotal, ...inflowWithoutTotal } = data.inflow;
+    const { total: outflowTotal, ...outflowWithoutTotal } = data.outflow;
+    
+    const [inflow, setInflow] = useState(inflowWithoutTotal);
     const [totalInflow, settotalInflow] = useState()
-    const [outflow, setOutflow] = useState({
-          bills: 1000,
-          misc: 2000,
-      });
+    const [outflow, setOutflow] = useState(outflowWithoutTotal);
     const [totalOutflow, settotalOutflow] = useState();
     const [remaining, setRemaining] = useState(totalInflow - totalOutflow);
     const [edit, setEdit] = useState(false);
@@ -40,6 +39,13 @@ function Form(){
       settotalOutflow(totalOutflow);
       setRemaining(totalInflow - totalOutflow);
     }, [inflow, outflow]);
+
+    useEffect(() => {
+      const { total: inflowTotal, ...inflowWithoutTotal } = data.inflow;
+      const { total: outflowTotal, ...outflowWithoutTotal } = data.outflow;
+      setInflow(inflowWithoutTotal);
+      setOutflow(outflowWithoutTotal);
+  }, [data]);
 
     const handleCategoryChange = (event) => {
       setNewEntry({ ...newEntry, category: event.target.value });
@@ -95,11 +101,15 @@ function Form(){
             ...prevInflow,
             [category]: 0, 
           }));
+          const updatedInflow = { ...inflow, [category]: 0 };
+          dispatch(updateData({ inflow: updatedInflow }));
         } else {
           setOutflow(prevOutflow => ({
             ...prevOutflow,
             [category]: 0, 
           }));
+          const updatedOutflow = { ...outflow, [category]: 0 };
+          dispatch(updateData({ outflow: updatedOutflow }));
         }
       };
     
@@ -131,6 +141,7 @@ function Form(){
           outflow: { ...updatedOutflow, total: totalOutflow },
           remaining: updatedRemaining,
         };
+
         dispatch(updateData(newData));
 
         setEdit(false);
