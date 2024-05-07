@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Bar } from 'react-chartjs-2';
@@ -16,7 +17,7 @@ function BarChart() {
 
 
   const chartData = {
-    labels: [t('Inflow'), t('Outflow'), ...outflowCategoriesTranslated], // Labels for inflow and outflow
+    labels: [t('Inflow'), t('Outflow'), ...outflowCategoriesTranslated], 
     datasets: [
       {
         label: t('Inflow Total'),

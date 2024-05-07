@@ -18,6 +18,8 @@ const initialState = {
   settings: {
     language: 'en',
   },
+
+  chartSwitch: false
 };
 
 const chartSlice = createSlice({
@@ -38,6 +40,9 @@ const chartSlice = createSlice({
       state.data.remaining = totalInflow - totalOutflow;
      
     },
+    switchChart: (state) => {
+      state.chartSwitch = !state.chartSwitch;
+    }
   },
 });
 
@@ -59,7 +64,7 @@ const store = configureStore({
   },
 });
 
-export const { updateData } = chartSlice.actions;
+export const { updateData, switchChart } = chartSlice.actions;
 export const { changeLanguage } = settingsSlice.actions;
 
 export default store;
